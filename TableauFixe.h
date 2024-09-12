@@ -14,8 +14,8 @@ private:
 public:
     TableauFixe();
     TableauFixe(int pLongueur);
-    TableauFixe(TableauFixe&);
-    TableauFixe(TableauFixe&&);
+    TableauFixe(TableauFixe& pTableauACopier);
+    TableauFixe(TableauFixe&& pTableauAMouvoir);
     int taille();
     bool estVide();
     T& operator[]();
@@ -29,6 +29,15 @@ public:
     TableauFixe& sousEnsemble(int pIndex);
 };
 
-//template <typename T> TableauFixe<T>::
+template<typename T>
+TableauFixe<T>::TableauFixe(const int pLongueur) {
+    size = pLongueur;
+    tabPtr = new T[size];
+}
+
+template<typename T>
+TableauFixe<T>::TableauFixe(): TableauFixe(0) {
+}
+
 
 #endif //TABLEAUFIXE_H
