@@ -19,7 +19,7 @@ public:
 
     TableauFixe(int pLongueur, T pArray[]);
 
-    TableauFixe(TableauFixe &pTableauACopier);
+    TableauFixe(const TableauFixe &pTableauACopier);
 
     TableauFixe(TableauFixe &&pTableauAMouvoir);
 
@@ -27,13 +27,19 @@ public:
 
     bool estVide() const;
 
-    T &operator[](int pIndex);
+    T &operator[](size_t pIndex) const;
 
-    T &element(int pIndex);
+    TableauFixe &operator=(const TableauFixe &pTableauACopier);
 
-    T premier();
+    TableauFixe &operator=(TableauFixe &&pTableauACopier);
 
-    T dernier();
+    bool operator==(TableauFixe &pTableauACopier);
+
+    T &element(size_t pIndex) const;
+
+    T &premier() const;
+
+    T &dernier() const;
 
     void remplis(T pValeur);
 
@@ -67,7 +73,7 @@ TableauFixe<T>::TableauFixe(const int pLongueur, T pArray[]) {
 }
 
 template<typename T>
-TableauFixe<T>::TableauFixe(TableauFixe &pTableauACopier) {
+TableauFixe<T>::TableauFixe(const TableauFixe &pTableauACopier) {
     size = pTableauACopier.taille();
     tabPtr = new T[taille()];
 
@@ -95,25 +101,25 @@ bool TableauFixe<T>::estVide() const {
 }
 
 template<typename T>
-T &TableauFixe<T>::operator[](int pIndex) {
+T &TableauFixe<T>::operator[](size_t pIndex) const {
     return tabPtr[pIndex];
 }
 
 template<typename T>
-T &TableauFixe<T>::element(int pIndex) {
-    if (pIndex < 0 || pIndex >= taille()) {
-        throw std::invalid_argument("L'index doit etre entre 0 et " + std::to_string(pIndex));
+T &TableauFixe<T>::element(size_t pIndex) const {
+    if (pIndex >= taille()) {
+        throw std::invalid_argument("L'index doit etre inférieure à " + std::to_string(taille()));
     }
     return tabPtr[pIndex];
 }
 
 template<typename T>
-T TableauFixe<T>::premier() {
+T &TableauFixe<T>::premier() const {
     return *tabPtr;
 }
 
 template<typename T>
-T TableauFixe<T>::dernier() {
+T &TableauFixe<T>::dernier() const {
     return tabPtr[taille() - 1];
 }
 
@@ -133,7 +139,6 @@ TableauFixe<T> TableauFixe<T>::sousEnsemble(int pIndex) {
     }
     return arr;
 }
-
 
 template<typename T>
 TableauFixe<T>::~TableauFixe() {
