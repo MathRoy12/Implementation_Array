@@ -23,7 +23,7 @@ public:
 
     TableauFixe(TableauFixe &&pTableauAMouvoir);
 
-    int taille();
+    int taille() const;
 
     bool estVide() const;
 
@@ -41,34 +41,51 @@ public:
 
     TableauFixe &fusion(TableauFixe &pTabAFusionner);
 
-    TableauFixe &sousEnsemble(int pIndex, int pNbElement);
-
-    TableauFixe &sousEnsemble(int pIndex);
+    template<size_t S>
+    TableauFixe sousEnsemble(int pIndex);
 
     ~TableauFixe();
 };
-
-template<typename T>
-TableauFixe<T>::TableauFixe(const int pLongueur) {
-    size = pLongueur;
-    tabPtr = new T[size];
-}
-
-template<typename T>
-TableauFixe<T>::TableauFixe(const int pLongueur, T pArray[]) {
-    size = pLongueur;
-    tabPtr = new T[size];
-    for (int i = 0; i < size; i++) {
-        *(tabPtr + i) = pArray[i];
-    }
-}
 
 template<typename T>
 TableauFixe<T>::TableauFixe(): TableauFixe(0) {
 }
 
 template<typename T>
-int TableauFixe<T>::taille() {
+TableauFixe<T>::TableauFixe(const int pLongueur) {
+    size = pLongueur;
+    tabPtr = new T[taille()];
+}
+
+template<typename T>
+TableauFixe<T>::TableauFixe(const int pLongueur, T pArray[]) {
+    size = pLongueur;
+    tabPtr = new T[taille()];
+    for (int i = 0; i < taille(); i++) {
+        tabPtr[i] = pArray[i];
+    }
+}
+
+template<typename T>
+TableauFixe<T>::TableauFixe(TableauFixe &pTableauACopier) {
+    size = pTableauACopier.taille();
+    tabPtr = new T[taille()];
+
+    for (int i = 0; i < taille(); i++) {
+        tabPtr[i] = pTableauACopier.element(i);
+    }
+}
+
+template<typename T>
+TableauFixe<T>::TableauFixe(TableauFixe &&pTableauAMouvoir) {
+    size = pTableauAMouvoir.taille();
+    tabPtr = pTableauAMouvoir.tabPtr;
+    pTableauAMouvoir.tabPtr = nullptr;
+    pTableauAMouvoir.size = 0;
+}
+
+template<typename T>
+int TableauFixe<T>::taille() const {
     return size;
 }
 
@@ -79,15 +96,15 @@ bool TableauFixe<T>::estVide() const {
 
 template<typename T>
 T &TableauFixe<T>::operator[](int pIndex) {
-    return *(tabPtr + pIndex);
+    return tabPtr[pIndex];
 }
 
 template<typename T>
 T &TableauFixe<T>::element(int pIndex) {
-    if (pIndex < 0 || pIndex >= size) {
+    if (pIndex < 0 || pIndex >= taille()) {
         throw std::invalid_argument("L'index doit etre entre 0 et " + std::to_string(pIndex));
     }
-    return *(tabPtr + pIndex);
+    return tabPtr[pIndex];
 }
 
 template<typename T>
@@ -97,15 +114,26 @@ T TableauFixe<T>::premier() {
 
 template<typename T>
 T TableauFixe<T>::dernier() {
-    return *(tabPtr + size - 1);
+    return tabPtr[taille() - 1];
 }
 
 template<typename T>
 void TableauFixe<T>::remplis(T pValeur) {
-    for (int i = 0; i < size; i++) {
-        *(tabPtr + i) = pValeur;
+    for (int i = 0; i < taille(); i++) {
+        tabPtr[i] = pValeur;
     }
 }
+
+template<typename T>
+template<size_t S>
+TableauFixe<T> TableauFixe<T>::sousEnsemble(int pIndex) {
+    TableauFixe<T> arr(S);
+    for (int i = 0; i < S; i++) {
+        arr[i] = tabPtr[pIndex + i];
+    }
+    return arr;
+}
+
 
 template<typename T>
 TableauFixe<T>::~TableauFixe() {
